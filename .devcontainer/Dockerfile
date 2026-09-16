@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y \
     openjdk-25-jdk \
     && rm -rf /var/lib/apt/lists/*
 
-# Flutter
-RUN git clone --branch 3.47.4 --depth 1 \
+# Flutter 3.47.4
+RUN git clone --branch 3.47.4 \
     https://github.com/flutter/flutter.git \
     /opt/flutter
 
@@ -38,18 +38,20 @@ RUN wget -q \
 
 ENV PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:$PATH"
 
-# Android SDK components
+# Accept Android SDK licenses
 RUN yes | sdkmanager --licenses > /dev/null || true
 
+# Android SDK components required by Flutter
 RUN sdkmanager \
     "platform-tools" \
-    "platforms;android-35" \
-    "build-tools;35.0.1"
+    "platforms;android-36" \
+    "build-tools;35.0.1" \
+    "build-tools;28.0.3"
 
-# Flutter configuration
+# Configure Flutter
 RUN flutter config --android-sdk ${ANDROID_HOME}
 
-# Pre-cache Flutter artifacts
+# Download Flutter Android and Web artifacts
 RUN flutter precache --android --web
 
 WORKDIR /workspaces/my-flutter-project
