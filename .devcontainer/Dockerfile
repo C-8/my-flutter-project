@@ -1,8 +1,9 @@
+
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Basic dependencies + Java 25
+# Basic dependencies + Java 17
 RUN apt-get update && apt-get install -y \
     curl \
     git \
@@ -12,8 +13,11 @@ RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
     libglu1-mesa \
-    openjdk-25-jdk \
+    openjdk-17-jdk \
     && rm -rf /var/lib/apt/lists/*
+
+# Java environment
+ENV JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
 
 # Flutter 3.47.4
 RUN git clone --branch 3.47.4 \
@@ -49,10 +53,10 @@ RUN sdkmanager \
     "build-tools;28.0.3"
 
 # Configure Flutter
-RUN flutter config --android-sdk ${ANDROID_HOME}
+RUN flutter config --android-sdk ${ANDROID_HOME} \
+    && flutter config --jdk-dir ${JAVA_HOME}
 
 # Download Flutter Android and Web artifacts
 RUN flutter precache --android --web
 
 WORKDIR /workspaces/my-flutter-project
-
